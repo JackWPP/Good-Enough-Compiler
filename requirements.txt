@@ -1,0 +1,20 @@
+# Good-Enough-Compiler 依赖包
+# 编译器核心功能无需额外依赖，仅使用Python标准库
+
+# Web界面依赖（可选）
+gradio>=3.0.0
+
+# 可视化依赖（可选）
+# graphviz>=0.20.0  # 需要先安装系统级Graphviz
+# matplotlib>=3.5.0
+# pillow>=9.0.0
+
+# 开发和测试依赖（可选）
+# pytest>=7.0.0
+# pytest-cov>=4.0.0
+# black>=22.0.0
+# flake8>=5.0.0
+
+# 文档生成依赖（可选）
+# sphinx>=5.0.0
+# sphinx-rtd-theme>=1.0.0
