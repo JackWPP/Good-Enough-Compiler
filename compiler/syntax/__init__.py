@@ -29,6 +29,14 @@ __author__ = 'Good-Enough-Compiler Team'
 # from .ast_nodes import ASTNode, Expression, Statement, Declaration
 # from .errors import SyntaxError, ParseError
 
+# AST相关模块
+from .ast_nodes import (
+    ASTNode, TerminalNode, NonTerminalNode, ProgramNode,
+    ExpressionNode, StatementNode, DeclarationNode,
+    ASTVisualizer, create_ast_node
+)
+from .ast_builder import ASTBuilder, ParseTreeToAST
+
 # 导出列表（当实现时更新）
 __all__ = [
     # 'SyntaxAnalyzer',

@@ -11,3 +11,13 @@ __pycache__/lexical_gui.cpython-312.pyc
 __pycache__/nfa_dfa_converter.cpython-312.pyc
 compiler/__pycache__/__init__.cpython-312.pyc
 compiler/__pycache__/api.cpython-312.pyc
+compiler/syntax/__pycache__/__init__.cpython-312.pyc
+compiler/syntax/__pycache__/ast_builder.cpython-312.pyc
+compiler/syntax/__pycache__/ast_nodes.cpython-312.pyc
+compiler/syntax/__pycache__/first_follow.cpython-312.pyc
+compiler/syntax/__pycache__/lr0_dfa.cpython-312.pyc
+compiler/syntax/__pycache__/lr1_dfa.cpython-312.pyc
+compiler/syntax/__pycache__/parser_engine.cpython-312.pyc
+compiler/syntax/__pycache__/slr1_check.cpython-312.pyc
+compiler/__pycache__/integrated_analyzer.cpython-312.pyc
+__pycache__/integrated_app.cpython-312.pyc

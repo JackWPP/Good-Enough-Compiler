@@ -44,13 +44,19 @@ class AnalysisResult:
     action_table: Dict
     goto_table: Dict
     lr1_svg: str
-    parse_steps: List[List[str]]
+    parse_steps: Any  # 改为Any类型以支持新的步骤格式
     syntax_errors: List[str]
     
     # 统计信息
     token_count: int
     analysis_time: float
     success: bool
+    
+    # AST相关结果（有默认值的字段必须放在最后）
+    ast_root: Optional[Dict] = None
+    ast_tree_string: Optional[str] = None
+    ast_dot_graph: Optional[str] = None
+    ast_svg: Optional[str] = None
 
 
 class IntegratedAnalyzer:
@@ -197,9 +203,29 @@ factor → ( expr ) | id | num"""
                 # 分析句子
                 if sentence.strip():
                     used_method = "SLR(1)" if is_slr1 else "LR(1)"
-                    analysis_steps = parse_sentence(self.grammar_text, sentence, method=used_method)
+                    parse_result = parse_sentence(self.grammar_text, sentence, method=used_method, build_ast=True)
+                    
+                    # 处理新的返回格式
+                    if isinstance(parse_result, dict):
+                        analysis_steps = parse_result.get('steps', [])
+                        ast_info = parse_result.get('ast', {})
+                        ast_root = ast_info.get('root')
+                        ast_tree_string = ast_info.get('tree_string')
+                        ast_dot_graph = ast_info.get('dot_graph')
+                        ast_svg = ast_info.get('svg')
+                    else:
+                        # 兼容旧格式
+                        analysis_steps = parse_result
+                        ast_root = None
+                        ast_tree_string = None
+                        ast_dot_graph = None
+                        ast_svg = None
                 else:
-                    analysis_steps = [[0, '', '', '', '未提供句子']]
+                    analysis_steps = [{'step': 0, 'stack': '', 'symbols': '', 'input': '', 'action': '未提供句子'}]
+                    ast_root = None
+                    ast_tree_string = None
+                    ast_dot_graph = None
+                    ast_svg = None
                 
                 syntax_errors = []
                 
@@ -216,6 +242,10 @@ factor → ( expr ) | id | num"""
                 svg1 = ""
                 analysis_steps = []
                 syntax_errors = [str(e)]
+                ast_root = None
+                ast_tree_string = None
+                ast_dot_graph = None
+                ast_svg = None
             
             # 4. 计算统计信息
             analysis_time = time.time() - start_time
@@ -236,6 +266,10 @@ factor → ( expr ) | id | num"""
                 lr1_svg=svg1,
                 parse_steps=analysis_steps,
                 syntax_errors=syntax_errors,
+                ast_root=ast_root,
+                ast_tree_string=ast_tree_string,
+                ast_dot_graph=ast_dot_graph,
+                ast_svg=ast_svg,
                 token_count=token_count,
                 analysis_time=analysis_time,
                 success=success
@@ -258,6 +292,10 @@ factor → ( expr ) | id | num"""
                 lr1_svg="",
                 parse_steps=[],
                 syntax_errors=[],
+                ast_root=None,
+                ast_tree_string=None,
+                ast_dot_graph=None,
+                ast_svg=None,
                 token_count=0,
                 analysis_time=analysis_time,
                 success=False
@@ -292,6 +330,10 @@ factor → ( expr ) | id | num"""
                 lr1_svg="",
                 parse_steps=[],
                 syntax_errors=[],
+                ast_root=None,
+                ast_tree_string=None,
+                ast_dot_graph=None,
+                ast_svg=None,
                 token_count=0,
                 analysis_time=0.0,
                 success=False
