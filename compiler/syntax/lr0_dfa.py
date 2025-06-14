@@ -29,7 +29,7 @@ class LR0Item:
 
 class LR0DFA:
     def __init__(self, productions):
-        self.augmented_start = "S'"
+        self.augmented_start = None  # 将在_parse_productions中设置
         self.states = []
         self.transitions = dict()
         self.symbols = set()
@@ -50,6 +50,8 @@ class LR0DFA:
                 self.grammar[left].append(body)
                 self.symbols.update(body)
             self.symbols.add(left)
+        # 使用与Grammar类一致的扩展开始符号命名
+        self.augmented_start = start + "'"
         self.grammar[self.augmented_start] = [[start]]
 
     def _closure(self, items):

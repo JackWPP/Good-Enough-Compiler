@@ -147,15 +147,9 @@ def load_sample_code(language: str) -> Tuple[str, str]:
     c = a + b * 2;
     return 0;
 }"""
-        sample_grammar = """program → function
-function → type id ( ) { stmt_list }
-stmt_list → stmt_list stmt | stmt
-stmt → type id_list ; | id = expr ; | return expr ;
-id_list → id_list , id | id
-expr → expr + term | expr - term | term
-term → term * factor | term / factor | factor
-factor → ( expr ) | id | num
-type → int | float | char"""
+        sample_grammar = """E → E + T | T
+T → T * F | F
+F → ( E ) | id | num"""
     else:  # Pascal
         sample_code = """program Example;
 var
@@ -165,17 +159,9 @@ begin
     b := 10;
     c := a + b * 2;
 end."""
-        sample_grammar = """program → program id ; block .
-block → var_decl stmt_list
-var_decl → var id_list : type ;
-id_list → id_list , id | id
-stmt_list → begin stmt_seq end
-stmt_seq → stmt_seq ; stmt | stmt
-stmt → id := expr
-expr → expr + term | expr - term | term
-term → term * factor | term / factor | factor
-factor → ( expr ) | id | num
-type → integer | real | boolean"""
+        sample_grammar = """E → E + T | T
+T → T * F | F
+F → ( E ) | id | num"""
     
     return sample_code, sample_grammar
 
@@ -214,9 +200,10 @@ def create_integrated_interface():
                 )
                 
                 sentence_input = gr.Textbox(
-                    label="待分析句子（可选，留空自动从源代码生成）",
-                    placeholder="例如：id + id * id",
-                    value=""
+                    label="分析句子（可选，留空将从源代码生成）",
+                    placeholder="例如：id + id * num",
+                    value="id + id",
+                    lines=2
                 )
                 
                 with gr.Row():

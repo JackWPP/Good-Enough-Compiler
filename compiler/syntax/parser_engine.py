@@ -1,5 +1,8 @@
 from .slr1_check import build_slr1_table
 from .lr1_dfa import build_lr1_output
+from .first_follow import process_first_follow
+from .lr0_dfa import LR0DFA
+from .slr1_check import build_slr1_table
 from .ast_builder import ASTBuilder, ParseTreeToAST
 from .ast_nodes import ASTVisualizer
 
@@ -21,7 +24,15 @@ def parse_sentence(grammar_text, sentence, method="SLR(1)", build_ast=True):
 
     # 获取分析表
     if method == "SLR(1)":
-        action_table, goto_table = build_slr1_table(grammar_text)
+        # 构建Grammar对象
+        grammar = process_first_follow(grammar_text)
+        # 构建LR0自动机获取states和transitions
+        lines = [line.strip() for line in grammar_text.strip().split('\n') if line.strip()]
+        dfa = LR0DFA(lines)
+        # 将states和transitions添加到grammar对象
+        grammar.states = dfa.states
+        grammar.transitions = dfa.transitions
+        action_table, goto_table = build_slr1_table(grammar)
     else:
         action_table, goto_table, _ = build_lr1_output(grammar_text)
 

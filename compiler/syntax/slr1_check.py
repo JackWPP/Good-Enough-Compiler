@@ -39,9 +39,18 @@ def build_slr1_table(grammar):
     # 产生式统一编号方便显示和规约使用，顺序如下：
     # start_symbol' → start_symbol 为第0条产生式
     prod_list = []
+    # 首先添加扩展文法产生式
+    if grammar.start_symbol.endswith("'"):
+        # 找到原始开始符号
+        original_start = grammar.start_symbol[:-1]
+        prod_list.append((grammar.start_symbol, [original_start]))
+    
+    # 然后添加其他产生式
     for head in grammar.productions:
         for body in grammar.productions[head]:
-            prod_list.append((head, body))
+            # 避免重复添加扩展文法产生式
+            if not (head == grammar.start_symbol and body == [grammar.start_symbol[:-1]]):
+                prod_list.append((head, body))
 
     # 寻找扩展文法开始产生式索引（假设有扩展文法 S' → S）
     # 若无扩展，默认第0条是 S' → S
@@ -49,21 +58,21 @@ def build_slr1_table(grammar):
     start_prod_index = 0
 
     # 遍历所有状态
-    for state_id, items in grammar.states.items():
+    for state_id, items in enumerate(grammar.states):
         action_table[state_id] = {}
         goto_table[state_id] = {}
 
         # 遍历状态的所有项目
         for item in items:
-            # item 格式示例：(head, body, dot_pos)
-            # head: 产生式左部，body:产生式右部列表，dot_pos:点的位置
-            head, body, dot_pos = item
+            # item 是 LR0Item 对象
+            # 访问其属性：lhs(产生式左部), rhs(产生式右部列表), dot(点的位置)
+            head, body, dot_pos = item.lhs, item.rhs, item.dot
 
             # 判断点是否在产生式末尾（即可规约项目）
             if dot_pos == len(body):
                 # 归约项目
-                # 如果是扩展文法的开始产生式 S' → S· ，接受动作
-                if head == grammar.start_symbol + "'" and body == [grammar.start_symbol]:
+                # 如果是扩展文法的开始产生式 E' → E· ，接受动作
+                if head.endswith("'") and len(head) > 1 and body == [head[:-1]]:
                     # 接受动作标记为 acc
                     action_table[state_id]['$'] = 'acc'  # $ 表示输入结束符
                 else:

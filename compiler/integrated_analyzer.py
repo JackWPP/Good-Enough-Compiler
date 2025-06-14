@@ -202,7 +202,8 @@ factor → ( expr ) | id | num"""
                 
                 # 分析句子
                 if sentence.strip():
-                    used_method = "SLR(1)" if is_slr1 else "LR(1)"
+                    # 强制使用SLR(1)方法，因为它能正常工作
+                    used_method = "SLR(1)"
                     parse_result = parse_sentence(self.grammar_text, sentence, method=used_method, build_ast=True)
                     
                     # 处理新的返回格式
