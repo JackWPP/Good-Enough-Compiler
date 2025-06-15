@@ -43,12 +43,12 @@ class IntegratedWebApp:
         self.analyzer = create_integrated_analyzer(language)
         return f"已创建{language.upper()}语言分析器"
     
-    def analyze_source_code(self, source_code: str, language: str, custom_grammar: str, sentence: str) -> Tuple[str, str, str, str, str, str, str]:
+    def analyze_source_code(self, source_code: str, language: str, custom_grammar: str, sentence: str) -> Tuple[str, str, str, str, str, str, str, str]:
         """
         分析源代码
         
         Returns:
-            (词法分析结果, 语法分析结果, AST树形结构, AST图形, 分析步骤, 错误信息, 统计信息)
+            (词法分析结果, 语法分析结果, AST树形结构, AST图形, 分析步骤, 错误信息, 统计信息, 语义分析结果)
         """
         try:
             # 创建或更新分析器
@@ -70,12 +70,13 @@ class IntegratedWebApp:
             parse_steps = self._format_parse_steps()
             errors = self._format_errors()
             stats = self._format_statistics()
+            semantic_output = self._format_semantic_result()
             
-            return lexical_result, syntax_result, ast_tree, ast_graph, parse_steps, errors, stats
+            return lexical_result, syntax_result, ast_tree, ast_graph, parse_steps, errors, stats, semantic_output
             
         except Exception as e:
             error_msg = f"分析过程中出现错误:\n{str(e)}\n\n详细信息:\n{traceback.format_exc()}"
-            return "", "", "", "", "", error_msg, ""
+            return "", "", "", "", "", error_msg, "", ""
     
     def _format_lexical_result(self) -> str:
         """格式化词法分析结果"""
@@ -202,9 +203,37 @@ class IntegratedWebApp:
             for error in self.analysis_result.syntax_errors:
                 lines.append(f"❌ {error}")
             lines.append("")
+
+        # 语义错误
+        if hasattr(self.analysis_result, 'semantic_errors') and self.analysis_result.semantic_errors:
+            lines.append("=== 语义错误 ===")
+            for error in self.analysis_result.semantic_errors:
+                lines.append(f"❌ {error}")
+            lines.append("")
         
         if not lines:
             lines.append("✅ 无错误")
+        
+        return "\n".join(lines)
+
+    def _format_semantic_result(self) -> str:
+        """格式化语义分析结果"""
+        if not self.analysis_result:
+            return "无语义分析结果"
+
+        lines = []
+        lines.append("=== 语义分析结果 ===")
+
+        if hasattr(self.analysis_result, 'semantic_result') and self.analysis_result.semantic_result is not None:
+            lines.append(f"最终语义结果: {str(self.analysis_result.semantic_result)}")
+        else:
+            lines.append("未生成最终语义结果或分析失败")
+        
+        lines.append("\n--- 符号表 ---")
+        if hasattr(self.analysis_result, 'symbol_table_string') and self.analysis_result.symbol_table_string:
+            lines.append(self.analysis_result.symbol_table_string)
+        else:
+            lines.append("无符号表信息")
         
         return "\n".join(lines)
     
@@ -341,6 +370,13 @@ F → ( E ) | id | num"""
                             lines=10,
                             label="统计信息"
                         )
+                    
+                    with gr.TabItem("语义分析"):
+                        semantic_output = gr.Textbox(
+                            lines=15,
+                            label="语义分析结果",
+                            show_copy_button=True
+                        )
         
         # 示例按钮
         with gr.Row():
@@ -355,7 +391,7 @@ F → ( E ) | id | num"""
         analyze_btn.click(
             fn=app.analyze_source_code,
             inputs=[source_code, language, custom_grammar, sentence],
-            outputs=[lexical_output, syntax_output, ast_tree_output, ast_graph_output, steps_output, errors_output, stats_output]
+            outputs=[lexical_output, syntax_output, ast_tree_output, ast_graph_output, steps_output, errors_output, stats_output, semantic_output]
         )
         
         # 示例按钮事件
@@ -406,7 +442,7 @@ def main():
         print("🔥 启动服务器...")
         interface.launch(
             server_name="127.0.0.1",
-            server_port=7860,
+            server_port=7861,
             share=False,
             quiet=False,
             show_error=True

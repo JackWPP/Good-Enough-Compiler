@@ -26,6 +26,9 @@ from .syntax.slr1_check import check_slr1, build_slr1_table
 from .syntax.lr1_dfa import build_lr1_output
 from .syntax.parser_engine import parse_sentence
 
+# 导入语义分析模块
+from .semantic.semantic_analyzer import SemanticAnalyzer
+
 
 @dataclass
 class AnalysisResult:
@@ -57,6 +60,11 @@ class AnalysisResult:
     ast_tree_string: Optional[str] = None
     ast_dot_graph: Optional[str] = None
     ast_svg: Optional[str] = None
+    
+    # 语义分析结果
+    semantic_result: Optional[Any] = None
+    semantic_errors: List[str] = None
+    symbol_table_string: Optional[str] = None
 
 
 class IntegratedAnalyzer:
@@ -76,6 +84,9 @@ class IntegratedAnalyzer:
         self.lexical_analyzer = self._create_lexical_analyzer()
         self.grammar_text = self._get_default_grammar()
         self.errors = []
+        
+        # 初始化语义分析器
+        self.semantic_analyzer = SemanticAnalyzer()
         
     def _create_lexical_analyzer(self) -> LexicalAnalyzer:
         """创建词法分析器"""
@@ -248,10 +259,42 @@ factor → ( expr ) | id | num"""
                 ast_dot_graph = None
                 ast_svg = None
             
-            # 4. 计算统计信息
+            # 4. 语义分析
+            semantic_result = None
+            semantic_errors = []
+            symbol_table_string = None
+            
+            try:
+                if ast_root and len(syntax_errors) == 0:
+                    # 构造语义分析器期望的parse_result对象
+                    mock_parse_result = type('ParseResult', (), {
+                        'success': True,
+                        'ast': ast_root,
+                        'errors': syntax_errors
+                    })()
+                    
+                    # 执行语义分析
+                    semantic_result = self.semantic_analyzer.analyze(mock_parse_result)
+                    semantic_errors = self.semantic_analyzer.get_errors()
+                    symbol_table_string = self.semantic_analyzer.get_symbol_table_string()
+                else:
+                    # 语法分析失败或没有AST，构造失败的parse_result
+                    mock_parse_result = type('ParseResult', (), {
+                        'success': False,
+                        'ast': None,
+                        'errors': syntax_errors
+                    })()
+                    
+                    semantic_result = self.semantic_analyzer.analyze(mock_parse_result)
+                    semantic_errors = self.semantic_analyzer.get_errors()
+                    symbol_table_string = self.semantic_analyzer.get_symbol_table_string()
+            except Exception as e:
+                semantic_errors = [f"语义分析错误: {str(e)}"]
+            
+            # 5. 计算统计信息
             analysis_time = time.time() - start_time
             token_count = len([t for t in tokens if t.type != TokenType.EOF])
-            success = len(lexical_errors) == 0 and len(syntax_errors) == 0
+            success = len(lexical_errors) == 0 and len(syntax_errors) == 0 and len(semantic_errors) == 0
             
             return AnalysisResult(
                 tokens=tokens,
@@ -273,7 +316,10 @@ factor → ( expr ) | id | num"""
                 ast_svg=ast_svg,
                 token_count=token_count,
                 analysis_time=analysis_time,
-                success=success
+                success=success,
+                semantic_result=semantic_result,
+                semantic_errors=semantic_errors,
+                symbol_table_string=symbol_table_string
             )
             
         except Exception as e:
