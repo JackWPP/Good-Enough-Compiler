@@ -112,16 +112,15 @@ Good-Enough-Compiler/
 ├── compiler/                    # 编译器核心模块
 │   ├── __init__.py             # 主模块初始化 ✅
 │   ├── api.py                  # 统一API接口 ✅
-│   ├── integrated_analyzer.py  # 集成分析器 ✅ (新增)
-│   ├── integrated_app.py       # 集成Web应用 ✅ (新增)
+│   ├── integrated_analyzer.py  # 集成分析器 ✅
+│   ├── integrated_app.py       # 集成Web应用 ✅
 │   ├── ir_generator.py         # 中间代码生成器 ✅
 │   ├── lexical/                # 词法分析模块 ✅ (已完成)
 │   │   ├── __init__.py         # ✅
 │   │   ├── token.py            # Token定义 ✅
 │   │   ├── analyzer.py         # 词法分析器 ✅
 │   │   ├── automata.py         # 自动机实现 ✅
-│   │   ├── c_rules.txt         # C语言词法规则 ✅
-│   │   └── pascal_rules.txt    # Pascal语言词法规则 ✅
+│   │   └── c_rules.txt         # C语言词法规则 ✅
 │   ├── syntax/                 # 语法分析模块 ✅ (基本完成)
 │   │   ├── __init__.py         # 基础结构 ✅
 │   │   ├── app.py              # 语法分析Web应用 ✅
@@ -145,18 +144,39 @@ Good-Enough-Compiler/
 │       ├── visualization.py    # 可视化工具 ✅
 │       ├── file_utils.py       # 文件处理 ✅
 │       └── formatters.py       # 格式化工具 ✅
-├── main_new.py                 # 主程序 ✅
-├── integrated_app.py           # 集成编译器Web应用 ✅ (新增)
-├── sample_code.c               # C语言测试文件 ✅
-├── sample_code.pas             # Pascal测试文件 ✅
-├── debug_analyze.py            # 集成分析调试工具 ✅ (新增)
-├── debug_lexer.py              # 词法分析器调试工具 ✅
-├── debug_parser.py             # 语法分析器调试工具 ✅ (新增)
-├── test_slr1_check.py          # SLR(1)冲突检测测试 ✅ (新增)
+├── tests/                      # 测试文件目录 ✅
+│   ├── __init__.py             # 测试模块初始化
+│   ├── test_app.py             # 应用程序测试
+│   ├── test_full_analysis.py   # 完整分析测试
+│   ├── test_import.py          # 导入测试
+│   ├── test_sample_grammar.py  # 示例文法测试
+│   └── test_slr1_check.py      # SLR(1)冲突检测测试 ✅
+├── examples/                   # 示例代码和配置文件 ✅
+│   ├── __init__.py             # 示例模块初始化
+│   ├── sample_code.c           # C语言测试文件 ✅
+│   ├── sample_code.pas         # Pascal测试文件 ✅
+│   └── lexical_rules.txt       # 词法规则配置文件 ✅
+├── scripts/                    # 调试脚本和工具 ✅
+│   ├── __init__.py             # 脚本模块初始化
+│   ├── debug_analyze.py        # 集成分析调试工具 ✅
+│   ├── debug_lexer.py          # 词法分析器调试工具 ✅
+│   ├── debug_parser.py         # 语法分析器调试工具 ✅
+│   ├── lexical_analyzer.py     # 原版词法分析器工具
+│   ├── lexical_gui.py          # 词法分析GUI工具
+│   └── nfa_dfa_converter.py    # 自动机转换工具
+├── docs/                       # 文档和参考资料 ✅
+│   ├── __init__.py             # 文档模块初始化
+│   ├── 答辩问题准备文档.md      # 答辩准备文档
+│   ├── 词法分析.md             # 词法分析文档
+│   ├── 参考文件/               # 参考资料目录
+│   │   └── 正则表达式toNFA-Code.md # 正则表达式转换参考
+│   └── image/                  # 图片资源目录
+│       └── 项目答辩文档/        # 答辩文档图片
 ├── main.py                     # 原版主程序 (保留)
 ├── main_new.py                 # 新版主程序 ✅
-├── lexical_analyzer.py         # 原版词法分析器 (保留)
-├── nfa_dfa_converter.py        # 原版自动机转换 (保留)
+├── integrated_app.py           # 集成编译器Web应用 ✅
+├── requirements.txt            # Python依赖包列表 ✅
+├── 项目答辩文档.md              # 项目答辩文档
 └── README.md                   # 项目文档 ✅
 ```
 
